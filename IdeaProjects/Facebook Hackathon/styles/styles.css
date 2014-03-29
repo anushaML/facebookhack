@@ -65,5 +65,8 @@ body {
     height: 50px;
     background-color: #fff;
     line-height: 45px;
+}
+.removeRow a {
     color: red;
+    text-decoration: none;
 }

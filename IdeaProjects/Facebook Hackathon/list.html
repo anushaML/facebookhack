@@ -77,11 +77,12 @@
        }(document, 'script', 'facebook-jssdk'));
     </script>
 <script type="text/javascript">
+    var userIdMap = {};
+
     function loadData(success) {
         FB.login(function(){}, {scope: "user_about_me, user_events, user_videos, user_checkins, user_friends, user_location, user_photo_video_tags, user_photos, user_activities, friends_photo_video_tags, friends_checkins, friends_photos, friends_videos, create_event, rsvp_event"});
         var accessToken = FB.getAccessToken();
         var sinceDate = getSinceDate();
-        var maxNum = $("#numPeople").val();
 
         $.ajax({
             url: "https://graph.facebook.com/me/photos?fields=id,from,likes,tags,created_time,updated_time&since=" + sinceDate + "&limit=100&access_token=" + accessToken,
@@ -122,9 +123,12 @@
 
                 var index = $.inArray(found, userList);
                 if (index == -1) {
-                    userList.push({ id: picFrom.id, count: currentCount, name: picFrom.name });
+                    var u = { id: picFrom.id, count: currentCount, name: picFrom.name };
+                    userList.push(u);
+                    userIdMap[picFrom.id] = u;
                 } else {
                     userList[index] = { id: picFrom.id, count: currentCount, name: picFrom.name };
+                    userIdMap[picFrom.id] = userList[index];
                 }
             }
 
@@ -145,9 +149,12 @@
                     currentCount++;
                     var index = $.inArray(found, userList);
                     if (index == -1) {
-                        userList.push({ id: tag.id, count: currentCount, name: tag.name });
+                        var u = { id: tag.id, count: currentCount, name: tag.name };
+                        userList.push(u);
+                        userIdMap[tag.id] = u;
                     } else {
                         userList[index] = { id: tag.id, count: currentCount, name: tag.name };
+                        userIdMap[tag.id] = userList[index];
                     }
                 }
 
@@ -163,7 +170,15 @@
             }
             return 0;
         });
-        drawRows(userList);
+
+        var maxNum = $("#numPeople").val();
+        if (!$.trim(maxNum).length) {
+            maxNum = 5;
+        }
+
+        userList = userList.slice(0, maxNum);
+
+        drawRows(userList)
     };
 
     function drawRows(data) {
@@ -195,6 +210,8 @@
             $(".nameRow", row).text(person.name);
             resultContainer.append(row);
         }
+
+        resultContainer.prepend("<input type='button' class='createEvent' value='Create Event' />");
     };
 
     function getSinceDate() {
@@ -238,8 +255,11 @@
 
     $("#results").on("click", "a.remove", function(ev) {
         var el = $(ev.target).parents(".resultRow:first");
+        userIdMap[el.attr("userId")] = undefined;
         el.remove();
         return false;
+    }).on("click", ".createEvent", function(ev) {
+
     });
 </script>
 </body>
