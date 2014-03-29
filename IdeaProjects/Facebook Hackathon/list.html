@@ -58,6 +58,9 @@
 </div>
 <div id="fb-root"></div>
 <script type="text/javascript" src="jquery-1.11.0.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+
 <script>
       window.fbAsyncInit = function() {
         FB.init({
@@ -85,7 +88,7 @@
         var sinceDate = getSinceDate();
 
         $.ajax({
-            url: "https://graph.facebook.com/me/photos?fields=id,from,likes,tags,created_time,updated_time&since=" + sinceDate + "&limit=100&access_token=" + accessToken,
+            url: "https://graph.facebook.com/me/photos?fields=id,from,likes,tags,created_time,updated_time&since=" + sinceDate + "&limit=1000&access_token=" + accessToken,
             success: success
         });
     };
@@ -105,7 +108,7 @@
 
         var eventName = encodeURIComponent(params.name).replace(/%20/g, '+');
         $.ajax({
-            url: "https://graph.facebook.com/me/events?name=" + eventName + "&start_time=2014-03-01T13%3A00%3A00-0800&access_token=" + accessToken,
+            url: "https://graph.facebook.com/me/events?name=" + eventName + "&start_time=" + params.startDate + "&access_token=" + accessToken,
             type: "POST",
             success: success
         });
@@ -124,15 +127,12 @@
     };
 
     function createEventWithUsers(usersToInvite) {
-       // var userIds = $.map(function() {
-       //     return this.id;
-       // });
-       // var userIdStr = userIds.join(",");
 
-        //var userIdStr = "1603574612,6422013";
+        var startDate = $(".startDate").datepicker().val();
+        var eventName = $(".eventName").val();
         var userIdStr = usersToInvite.join(",");
 
-        createEvent({name: "hello goodbye"}, function(result) {
+        createEvent({name: eventName, startDate: startDate}, function(result) {
             var eventId = result.id;
             inviteUsersToEvent({eventId: eventId, userIds: userIdStr}, function(result) {
 
@@ -253,7 +253,10 @@
             $(".nameRow", row).text(person.name);
             resultContainer.append(row);
         }
+        resultContainer.prepend("Start Date: <input type='text' class='startDate'/>");
+        resultContainer.prepend("Event Name: <input type='text' class='eventName'/>");
 
+        $(".startDate").datepicker();
         resultContainer.prepend("<input type='button' class='createEvent' value='Create Event' />");
     };
 
