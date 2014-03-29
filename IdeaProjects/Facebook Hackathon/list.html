@@ -256,8 +256,6 @@
 
     $("#results").on("click", "a.remove", function(ev) {
         var el = $(ev.target).parents(".resultRow:first");
-        userIdMap[el.attr("userId")] = undefined;
-        el.remove();
         return false;
     }).on("click", ".createEvent", function(ev) {
 
