@@ -300,12 +300,12 @@
     $("#generate").click(function(ev) {
          $("#filters").css("width", "30%");
          $("#results").show().empty().append(getLoadingDiv());
-        /* getMyId(function(result) {
+         getMyId(function(result) {
             myId = result.id;
          });
          loadData(function(result) {
             getUsersToDisplay(result);
-         });*/
+         });
     });
 
     $("#results").on("click", "a.remove", function(ev) {
