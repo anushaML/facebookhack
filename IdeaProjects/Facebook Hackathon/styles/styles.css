@@ -1,0 +1,25 @@
+body {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+#filters {
+    width: 100%;
+    height: 100%;
+    float: left;
+    background-color: #4C66A4;
+    color: #fff;
+    padding: 5px;
+}
+
+#results {
+    width: 66%;
+    background: #eee;
+    height: 100%;
+    float: left;
+    padding: 5px;
+}
+#startAge, #endAge, #numPeople {
+    width: 25px;
+}
