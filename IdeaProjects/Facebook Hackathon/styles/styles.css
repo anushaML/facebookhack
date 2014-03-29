@@ -23,6 +23,10 @@ body {
     float: left;
     padding: 5px;
     color: #4C66A4;
+    padding-bottom: 30px;
+    border-bottom: 1px #000 solid;
+    border-left: 1px #000 solid;
+    border-right: 1px #000 solid;
 }
 #startAge, #endAge, #numPeople {
     width: 25px;
