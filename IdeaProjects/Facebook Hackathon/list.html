@@ -18,29 +18,43 @@
                 <option value="1year">1 Year</option>
                 <option value="3years">3 Years</option>
                 <option value="5years">5 Years</option>
-                <option value="unlimited">Unlimited</option>
             </select>
         </div>
+        <!--
         <div>
             <input type="text" id="startAge" name="startAge" />
             to
             <input type="text" id="endAge" name="endAge" />
             years old
         </div>
+        -->
         <div>
             <input type="text" id="numPeople" name="numPeople" /> number of people
         </div>
+        <!--
         <div>
             Exclude
             <select name="exclude">
                 <option>Lists from FB</option>
             </select>
         </div>
+        -->
         <input type="button" id="generate" value="Create List" />
     </form>
 </div>
+<div id="templates" style="display:none;">
+    <div class="resultRow">
+        <div class="profilePic">:)</div>
+        <div class="info">
+            <div class="nameRow">
+            </div>
+        </div>
+        <div class="removeRow">
+            <a href="javascript:void(0)" class="remove">x</a>
+        </div>
+    </div>
+</div>
 <div id="results" style="display:none;">
-    STUFF HERE
 </div>
 <div id="fb-root"></div>
 <script type="text/javascript" src="jquery-1.11.0.min.js"></script>
@@ -66,26 +80,166 @@
     function loadData(success) {
         FB.login(function(){}, {scope: "user_about_me, user_events, user_videos, user_checkins, user_friends, user_location, user_photo_video_tags, user_photos, user_activities, friends_photo_video_tags, friends_checkins, friends_photos, friends_videos, create_event, rsvp_event"});
         var accessToken = FB.getAccessToken();
+        var sinceDate = getSinceDate();
+        var maxNum = $("#numPeople").val();
+
         $.ajax({
-            url: "https://graph.facebook.com/me/photos?fields=id,from,likes,tags,created_time,updated_time&since=2013-03-23&access_token=" + accessToken,
+            url: "https://graph.facebook.com/me/photos?fields=id,from,likes,tags,created_time,updated_time&since=" + sinceDate + "&limit=100&access_token=" + accessToken,
             success: success
         });
     };
 
+    function getMyId(success) {
+        FB.login(function(){}, {scope: "user_about_me, user_events, user_videos, user_checkins, user_friends, user_location, user_photo_video_tags, user_photos, user_activities, friends_photo_video_tags, friends_checkins, friends_photos, friends_videos, create_event, rsvp_event"});
+        var accessToken = FB.getAccessToken();
+        $.ajax({
+            url: "https://graph.facebook.com/me/?fields=id&access_token=" + accessToken,
+            success: success
+        });
+    };
+
+     function getUsersToDisplay(results) {
+        var results = results.data;
+
+        var userList = [];
+        $.each(results, function(i, result) {
+            var picFrom = result.from;
+            var tags = result.tags.data;
+
+            if (picFrom.id !== myId) {
+                var foundList = $.grep(userList, function(value, index) {
+                    return value.id == picFrom.id;
+                });
+
+                var currentCount = 0;
+                var found;
+                if (foundList && foundList.length) {
+                   found = foundList[0];
+                   currentCount = found.count;
+
+                }
+                currentCount++;
+
+                var index = $.inArray(found, userList);
+                if (index == -1) {
+                    userList.push({ id: picFrom.id, count: currentCount, name: picFrom.name });
+                } else {
+                    userList[index] = { id: picFrom.id, count: currentCount, name: picFrom.name };
+                }
+            }
+
+            $.each(tags, function(i, tag) {
+                if (tag.id != myId) {
+                    var foundList = $.grep(userList, function(value, index) {
+                        return value.id == tag.id;
+                    });
+
+                    var currentCount = 0;
+                    var found;
+                    if (foundList && foundList.length) {
+                        found = foundList[0];
+                       currentCount = found.count;
+                    }
+
+                    // check if user is friend?
+                    currentCount++;
+                    var index = $.inArray(found, userList);
+                    if (index == -1) {
+                        userList.push({ id: tag.id, count: currentCount, name: tag.name });
+                    } else {
+                        userList[index] = { id: tag.id, count: currentCount, name: tag.name };
+                    }
+                }
+
+            });
+
+        });
+        userList = userList.sort(function(a, b) {
+            if (a.count > b.count) {
+                return -1;
+            }
+            if (a.count < b.count ) {
+                return 1;
+            }
+            return 0;
+        });
+        drawRows(userList);
+    };
+
     function drawRows(data) {
 
+        var fakeData = [
+            {
+                id: 88888,
+                name: "Mike Wong"
+            },
+            {
+                id: 33323,
+                name: "Viv Kwan"
+            },
+            {
+                id: 33334,
+                name: "Sandra Ngo"
+            },
+            {
+                id: 33233,
+                name: "Anusha M."
+            }
+        ];
+        var dataToUse = data ? data : fakeData;
+        var resultContainer = $("#results");
+        for (i in dataToUse) {
+            var person = dataToUse[i];
+            var row = $("#templates .resultRow").clone();
+            row.attr("userId", person.id);
+            $(".nameRow", row).text(person.name);
+            resultContainer.append(row);
+        }
     };
 
     function getSinceDate() {
-    
+        var sinceSelection = $("#timeRange").val();
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth();
+        var yyyy = today.getFullYear();
+
+        switch(sinceSelection) {
+            case "5months":
+                mm = mm - 5;
+                if (mm < 0) {
+                    mm = 11 + mm;
+                    yyyy--;
+                }
+                break;
+            case "1year":
+                yyyy = yyyy - 1;
+                break;
+            case "3years":
+                yyyy = yyyy - 3;
+                break;
+            case "5years":
+                yyyy = yyyy - 5;
+                break;
+        }
+        return "" + yyyy + "-" + mm + "-" + dd;
     };
 
     $("#generate").click(function(ev) {
          $("#filters").css("width", "30%");
          $("#results").show();
-         loadData(function(result) {
-            drawRows(result);
+         getMyId(function(result) {
+            myId = result.id;
          });
+         loadData(function(result) {
+            getUsersToDisplay(result);
+         });
+    });
+
+    $("#results").on("click", "a.remove", function(ev) {
+        var el = $(ev.target).parents(".resultRow:first");
+        el.remove();
+        return false;
     });
 </script>
 </body>
