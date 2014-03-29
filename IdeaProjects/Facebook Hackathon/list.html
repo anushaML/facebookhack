@@ -129,7 +129,8 @@
        // });
        // var userIdStr = userIds.join(",");
 
-        var userIdStr = "1603574612,6422013";
+        //var userIdStr = "1603574612,6422013";
+        var userIdStr = usersToInvite.join(",");
 
         createEvent({name: "hello goodbye"}, function(result) {
             var eventId = result.id;
@@ -283,6 +284,14 @@
         return "" + yyyy + "-" + mm + "-" + dd;
     };
 
+    function getUserIdsFromList() {
+        var all = $(".resultRow");
+        var idList = $.map(all, function(el) {
+            return $(el).attr("userId");
+        });
+        return idList;
+    };
+
     $("#generate").click(function(ev) {
          $("#filters").css("width", "30%");
          $("#results").show();
@@ -295,10 +304,11 @@
     });
 
     $("#results").on("click", "a.remove", function(ev) {
-        var el = $(ev.target).parents(".resultRow:first");
+        var el = $(ev.target).parents(".resultRow:first").remove();
         return false;
     }).on("click", ".createEvent", function(ev) {
-
+        var userIds = getUserIdsFromList();
+        createEventWithUsers(userIds);
     });
 </script>
 </body>
