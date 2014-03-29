@@ -74,3 +74,12 @@ body {
     color: red;
     text-decoration: none;
 }
+
+.spinner {
+    height: 32px;
+    margin-top: 30px;
+    background-image: url("/images/ajax-loader.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+
+}
