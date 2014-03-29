@@ -13,7 +13,7 @@
     <form>
         <div>
             Have interacted with in the last
-            <select name="timeRange">
+            <select id="timeRange" name="timeRange">
                 <option value="5months">6 Months</option>
                 <option value="1year">1 Year</option>
                 <option value="3years">3 Years</option>
@@ -63,9 +63,29 @@
        }(document, 'script', 'facebook-jssdk'));
     </script>
 <script type="text/javascript">
+    function loadData(success) {
+        FB.login(function(){}, {scope: "user_about_me, user_events, user_videos, user_checkins, user_friends, user_location, user_photo_video_tags, user_photos, user_activities, friends_photo_video_tags, friends_checkins, friends_photos, friends_videos, create_event, rsvp_event"});
+        var accessToken = FB.getAccessToken();
+        $.ajax({
+            url: "https://graph.facebook.com/me/photos?fields=id,from,likes,tags,created_time,updated_time&since=2013-03-23&access_token=" + accessToken,
+            success: success
+        });
+    };
+
+    function drawRows(data) {
+
+    };
+
+    function getSinceDate() {
+    
+    };
+
     $("#generate").click(function(ev) {
          $("#filters").css("width", "30%");
          $("#results").show();
+         loadData(function(result) {
+            drawRows(result);
+         });
     });
 </script>
 </body>
