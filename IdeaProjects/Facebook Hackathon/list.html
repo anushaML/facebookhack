@@ -99,6 +99,46 @@
         });
     };
 
+    function createEvent(params, success) {
+        FB.login(function(){}, {scope: "user_about_me, user_events, user_videos, user_checkins, user_friends, user_location, user_photo_video_tags, user_photos, user_activities, friends_photo_video_tags, friends_checkins, friends_photos, friends_videos, create_event, rsvp_event"});
+        var accessToken = FB.getAccessToken();
+
+        var eventName = encodeURIComponent(params.name).replace(/%20/g, '+');
+        $.ajax({
+            url: "https://graph.facebook.com/me/events?name=" + eventName + "&start_time=2014-03-01T13%3A00%3A00-0800&access_token=" + accessToken,
+            type: "POST",
+            success: success
+        });
+    };
+
+    function inviteUsersToEvent(params, success) {
+        FB.login(function(){}, {scope: "user_about_me, user_events, user_videos, user_checkins, user_friends, user_location, user_photo_video_tags, user_photos, user_activities, friends_photo_video_tags, friends_checkins, friends_photos, friends_videos, create_event, rsvp_event"});
+        var accessToken = FB.getAccessToken();
+
+        var eventName = encodeURIComponent(params.name).replace(/%20/g, '+');
+        $.ajax({
+            url: "https://graph.facebook.com/" + params.eventId + "/invited?users=" + params.userIds + "&access_token=" + accessToken,
+            type: "POST",
+            success: success
+        });
+    };
+
+    function createEventWithUsers(usersToInvite) {
+       // var userIds = $.map(function() {
+       //     return this.id;
+       // });
+       // var userIdStr = userIds.join(",");
+
+        var userIdStr = "1603574612,6422013";
+
+        createEvent({name: "hello goodbye"}, function(result) {
+            var eventId = result.id;
+            inviteUsersToEvent({eventId: eventId, userIds: userIdStr}, function(result) {
+
+            });
+        });
+    };
+
      function getUsersToDisplay(results) {
         var results = results.data;
 
