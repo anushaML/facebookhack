@@ -83,3 +83,9 @@ body {
     background-position: center;
 
 }
+
+.goToLink {
+    text-decoration: none;
+    color: #4C66A4;
+    text-align: center;
+}

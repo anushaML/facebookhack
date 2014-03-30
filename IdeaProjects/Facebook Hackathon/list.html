@@ -135,7 +135,10 @@
         createEvent({name: eventName, startDate: startDate}, function(result) {
             var eventId = result.id;
             inviteUsersToEvent({eventId: eventId, userIds: userIdStr}, function(result) {
-
+                var url = "http://www.facebook.com/events/" + eventId;
+                //window.open(url, "_blank");
+                var link = $("<a />").attr("href", url).text("Click here to see the event").attr("target", "_blank").addClass("goToLink");
+                $("#results").empty().append(link);
             });
         });
     };
@@ -253,11 +256,11 @@
             $(".nameRow", row).text(person.name);
             resultContainer.append(row);
         }
+        resultContainer.prepend("<input type='button' class='createEvent' value='Create Event' />");
         resultContainer.prepend("Start Date: <input type='text' class='startDate'/>");
         resultContainer.prepend("Event Name: <input type='text' class='eventName'/>");
 
         $(".startDate").datepicker();
-        resultContainer.prepend("<input type='button' class='createEvent' value='Create Event' />");
     };
 
     function getSinceDate() {
